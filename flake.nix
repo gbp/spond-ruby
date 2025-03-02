@@ -26,6 +26,9 @@
           buildInputs = [
             ruby_3_4
             bundix
+
+            # For psych gem:
+            libyaml
           ];
       };
   });
