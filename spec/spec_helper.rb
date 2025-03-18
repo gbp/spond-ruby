@@ -1,4 +1,7 @@
+require "bundler/setup"
 require "spond"
+require "vcr"
+require "webmock/rspec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,4 +13,18 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+end
+
+VCR.configure do |config|
+  config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
+  config.hook_into :webmock
+  config.configure_rspec_metadata!
+
+  # Filter sensitive data
+  config.filter_sensitive_data("<EMAIL>") { ENV["SPOND_EMAIL"] }
+  config.filter_sensitive_data("<PASSWORD>") { ENV["SPOND_PASSWORD"] }
+  config.filter_sensitive_data("<TOKEN>") { ENV["SPOND_TOKEN"] }
+
+  # Don't allow any real HTTP connections
+  config.allow_http_connections_when_no_cassette = false
 end

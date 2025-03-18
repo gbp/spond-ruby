@@ -1,0 +1,16 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.spond.com/core/v1/auth2/login
+    body:
+      encoding: UTF-8
+      string: '{"email":"wrong@email.com","password":"wrongpass"}'
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    body:
+      encoding: UTF-8
+      string: '{"message":"Wrong email or password.","errorKey":"wrongEmailOrPassword"}'
+  recorded_at: Mon, 17 Mar 2025 23:19:32 GMT

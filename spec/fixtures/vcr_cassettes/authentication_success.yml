@@ -1,0 +1,15 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.spond.com/core/v1/auth2/login
+    body:
+      encoding: UTF-8
+      string: '{"email":"test@example.com","password":"password123"}'
+  response:
+    status:
+      code: 200
+    body:
+      encoding: UTF-8
+      string: '{"accessToken":{"token":"ABC"}}'
+  recorded_at: Mon, 17 Mar 2025 23:19:32 GMT
