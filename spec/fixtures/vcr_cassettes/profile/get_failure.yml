@@ -1,0 +1,16 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.spond.com/core/v1/profile
+    headers:
+      Authorization:
+      - Bearer test-token-12345
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    body:
+      encoding: UTF-8
+      string: '{"message":"User is not logged in.","errorKey":"notLoggedIn"}'
+  recorded_at: Mon, 17 Mar 2025 23:19:32 GMT

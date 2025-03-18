@@ -1,4 +1,5 @@
 require_relative "spond/client"
+require_relative "spond/profile"
 require_relative "spond/version"
 
 module Spond
@@ -12,5 +13,9 @@ module Spond
       password: ENV["SPOND_PASSWORD"],
       token: ENV["SPOND_TOKEN"]
     )
+  end
+
+  def self.profile
+    @profile ||= Profile.get
   end
 end

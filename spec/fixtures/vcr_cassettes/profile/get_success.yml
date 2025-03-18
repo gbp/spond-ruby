@@ -1,0 +1,15 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.spond.com/core/v1/profile
+    headers:
+      Authorization:
+      - Bearer test-token-12345
+  response:
+    status:
+      code: 200
+    body:
+      encoding: UTF-8
+      string: '{"id":"user123","firstName":"John","lastName":"Doe","primaryEmail":"john@example.com"}'
+  recorded_at: Mon, 17 Mar 2025 12:00:00 GMT

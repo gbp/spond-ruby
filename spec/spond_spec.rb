@@ -60,6 +60,19 @@ RSpec.describe Spond do
     end
   end
 
+  describe ".profile" do
+    it "calls Profile.get" do
+      expect(Spond::Profile).to receive(:get)
+      Spond.profile
+    end
+
+    it "memorizes the result" do
+      expect(Spond::Profile).to receive(:get).and_return(double).once
+      Spond.profile
+      Spond.profile
+    end
+  end
+
   it "has a version number" do
     expect(Spond::VERSION).not_to be_nil
   end
