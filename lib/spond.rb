@@ -1,5 +1,6 @@
 require_relative "spond/client"
 require_relative "spond/profile"
+require_relative "spond/group"
 require_relative "spond/version"
 
 module Spond
@@ -17,5 +18,9 @@ module Spond
 
   def self.profile
     @profile ||= Profile.get
+  end
+
+  def self.groups
+    @groups ||= Group.all
   end
 end

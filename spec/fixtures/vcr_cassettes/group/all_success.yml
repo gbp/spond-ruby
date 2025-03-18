@@ -1,0 +1,15 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.spond.com/core/v1/groups
+    headers:
+      Authorization:
+      - Bearer test-token-12345
+  response:
+    status:
+      code: 200
+    body:
+      encoding: UTF-8
+      string: '[{"id":"group123","contactPerson":{"contactMethod":"app","id":"account123","email":"spond@example.com","firstName":"Account Owner First Name","lastName":"Account Owner Last Name","unableToReach":false},"name":"My Spond Group","welcomeMessage":"Welcome!","activity":"running","imageUrl":"","createdTime":"1970-01-01T00:00:00Z","members":[{"id":"member123","profile":{"contactMethod":"app","id":"profile123","firstName":"Profile First Name","lastName":"Profile Last Name","imageUrl":"","unableToReach":false},"firstName":"Member First Name","lastName":"Member Last Name","createdTime":"1970-01-01T00:00:00Z","guardians":[],"subGroups":[],"dateOfBirth":"1970-01-01","fields":{},"respondent":true}],"subGroups":[],"experiments":{},"shareContactInfo":false,"adminsCanAddMembers":true,"contactInfoHidden":true,"memberPermissions":["posts"],"guardianPermissions":["posts"],"chatAgeLimit":18,"type":3,"invitedToAppTime":"1970-01-01T00:00:00Z","signupUrl":"https://group.spond.com/ABCDE","countryCode":"GBR","allowSmsNag":false,"bonusEnabled":false,"fieldDefs":[],"defaultFields":{"field_member_address":{"permission":"ADMINS_AND_ADULT_MEMBERS","locked":false,"required":false},"field_member_dob":{"permission":"ADMINS_AND_ADULT_MEMBERS","locked":false,"required":false},"field_member_guardian":{"permission":"ADMINS_AND_ADULT_MEMBERS","locked":false,"required":false}},"roles":[{"id":"role123","name":"Group manager","permissions":["members","admins","settings","events","posts","polls","payments","chat","files","fundraisers"]},{"id":"role456","name":"Helper","permissions":["events","posts","polls","payments","fundraisers"]}],"addressFormat":["street","city","zip"],"allowPrivatePayoutAccounts":true}]'
+  recorded_at: Thu, 27 Mar 2025 20:54:42 GMT

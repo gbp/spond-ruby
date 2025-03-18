@@ -73,6 +73,19 @@ RSpec.describe Spond do
     end
   end
 
+  describe ".groups" do
+    it "calls Group.all" do
+      expect(Spond::Group).to receive(:all)
+      Spond.groups
+    end
+
+    it "memorizes the result" do
+      expect(Spond::Group).to receive(:all).and_return(double).once
+      Spond.groups
+      Spond.groups
+    end
+  end
+
   it "has a version number" do
     expect(Spond::VERSION).not_to be_nil
   end
