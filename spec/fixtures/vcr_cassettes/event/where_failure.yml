@@ -1,0 +1,16 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.spond.com/core/v1/sponds
+    headers:
+      Authorization:
+      - Bearer test-token-12345
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    body:
+      encoding: UTF-8
+      string: '{"message":"Not authenticated"}'
+  recorded_at: Thu, 27 Mar 2025 20:54:42 GMT

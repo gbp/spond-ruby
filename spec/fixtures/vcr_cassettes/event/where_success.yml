@@ -1,0 +1,15 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.spond.com/core/v1/sponds
+    headers:
+      Authorization:
+      - Bearer test-token-12345
+  response:
+    status:
+      code: 200
+    body:
+      encoding: UTF-8
+      string: '[{"id":"event123","creatorId":"profile123","owners":[{"id":"profile123","response":"accepted","email":"spond@example.com","firstName":"Profile First Name","lastName":"Profile Last Name","appUser":true,"unableToReach":false,"imageUrl":""}],"heading":"Event Title","description":"Event Description","startTimestamp":"2025-01-01T01:00:00Z","endTimestamp":"2025-01-01T02:00:00Z","openEnded":true,"picture":"","recipients":{"group":{"id":"group123","contactPersonId":"profile123","name":"Group Name","imageUrl":"","createdTime":0,"members":[{"id":"member123","profile":{"contactMethod":"app","id":"profile123","email":"spood@example.com","firstName":"Profile First Name","lastName":"Profile Last Name","unableToReach":false},"firstName":"Member First Name","lastName":"Member Last Name","respondent":true,"guardians":[]}],"type":3,"activity":"running"},"profiles":[{"id":"taskResponse123","profileId":"profile123","firstName":"Profile First Name","lastName":"Profile Last Name","imageUrl":""}],"guardians":[]},"responses":{"acceptedIds":["member123"],"declinedIds":[],"unansweredIds":[],"waitinglistIds":[],"unconfirmedIds":[]},"tasks":{"openTasks":[{"id":"task123","name":"Task 1","description":"Important task","adultsOnly":false,"type":"OPEN","accepted":[{"id":"taskResponse123"}],"declined":[],"unanswered":[]}],"assignedTasks":[]},"comments":[],"attachments":[],"createdTime":"1970-01-01T00:00:00Z","expired":false,"visibility":"ALL","behalfOfIds":[],"autoAccept":false,"hidden":false,"autoReminderType":"DISABLED","participantsHidden":false,"registered":false,"commentsDisabled":false,"type":"EVENT","updated":0,"matchEvent":false}]'
+  recorded_at: Thu, 27 Mar 2025 20:54:42 GMT
