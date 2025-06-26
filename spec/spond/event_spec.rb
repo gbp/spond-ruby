@@ -93,13 +93,29 @@ RSpec.describe Spond::Event do
     end
     let(:event) { described_class.new(event_data) }
 
-    describe "#initialize" do
-      it "sets the id and data attributes" do
+    describe "Resource base functionality" do
+      it "inherits common Resource functionality" do
+        expect(event).to be_a(Spond::Resource)
         expect(event.id).to eq("event123")
         expect(event.data).to eq(event_data)
       end
 
-      it "parses comments into Comment objects" do
+      it "provides data access via method_missing" do
+        expect(event.title).to eq("Test Event")
+      end
+
+      it "raises NoMethodError for keys that don't exist" do
+        expect { event.nonexistent_field }.to raise_error(NoMethodError)
+      end
+
+      it "responds correctly to attribute queries" do
+        expect(event.respond_to?(:title)).to be true
+        expect(event.respond_to?(:nonexistent_field)).to be false
+      end
+    end
+
+    describe "#comments (has_many association)" do
+      it "loads comments via has_many local association" do
         expect(event.comments).to be_an(Array)
         expect(event.comments.length).to eq(1)
         expect(event.comments.first).to be_a(Spond::Comment)
@@ -109,6 +125,13 @@ RSpec.describe Spond::Event do
       it "handles events without comments" do
         event_without_comments = described_class.new({"id" => "event456"})
         expect(event_without_comments.comments).to eq([])
+      end
+
+      it "memoizes comments" do
+        # Access comments twice to ensure memoization
+        first_access = event.comments
+        second_access = event.comments
+        expect(first_access).to equal(second_access)
       end
     end
 
@@ -129,24 +152,6 @@ RSpec.describe Spond::Event do
       end
     end
 
-    describe "#method_missing" do
-      it "returns data values for keys that exist" do
-        expect(event.title).to eq("Test Event")
-      end
 
-      it "raises NoMethodError for keys that don't exist" do
-        expect { event.nonexistent_field }.to raise_error(NoMethodError)
-      end
-    end
-
-    describe "#respond_to_missing?" do
-      it "returns true for keys that exist in data" do
-        expect(event.respond_to?(:title)).to be true
-      end
-
-      it "returns false for keys that don't exist in data" do
-        expect(event.respond_to?(:nonexistent_field)).to be false
-      end
-    end
   end
 end

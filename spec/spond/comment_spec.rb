@@ -26,16 +26,19 @@ RSpec.describe Spond::Comment do
 
   let(:comment) { described_class.new(comment_data) }
 
-  describe "#initialize" do
-    it "sets all attributes correctly" do
+  describe "Resource base functionality" do
+    it "inherits common Resource functionality" do
       expect(comment).to be_a(Spond::Resource)
       expect(comment.id).to eq("comment123")
+      expect(comment.data).to eq(comment_data)
+    end
+
+    it "sets all attributes correctly" do
       expect(comment.from_profile_id).to eq("profile123")
       expect(comment.timestamp).to eq("2023-12-01T10:30:00Z")
       expect(comment.text).to eq("This is my witty comment")
       expect(comment.children).to be_an(Array)
       expect(comment.reactions).to be_a(Hash)
-      expect(comment.data).to eq(comment_data)
     end
 
     it "handles missing optional fields" do
@@ -44,6 +47,19 @@ RSpec.describe Spond::Comment do
 
       expect(minimal_comment.children).to eq([])
       expect(minimal_comment.reactions).to eq({})
+    end
+
+    it "provides data access via method_missing" do
+      expect(comment.fromProfileId).to eq("profile123")
+    end
+
+    it "raises NoMethodError for keys that don't exist" do
+      expect { comment.nonexistent_field }.to raise_error(NoMethodError)
+    end
+
+    it "responds correctly to attribute queries" do
+      expect(comment.respond_to?(:fromProfileId)).to be true
+      expect(comment.respond_to?(:nonexistent_field)).to be false
     end
   end
 
@@ -121,26 +137,6 @@ RSpec.describe Spond::Comment do
       expect(described_class).to receive(:new).once.and_call_original
       comment.child_comments
       comment.child_comments
-    end
-  end
-
-  describe "#method_missing" do
-    it "returns data values for keys that exist" do
-      expect(comment.fromProfileId).to eq("profile123")
-    end
-
-    it "raises NoMethodError for keys that don't exist" do
-      expect { comment.nonexistent_field }.to raise_error(NoMethodError)
-    end
-  end
-
-  describe "#respond_to_missing?" do
-    it "returns true for keys that exist in data" do
-      expect(comment.respond_to?(:fromProfileId)).to be true
-    end
-
-    it "returns false for keys that don't exist in data" do
-      expect(comment.respond_to?(:nonexistent_field)).to be false
     end
   end
 end

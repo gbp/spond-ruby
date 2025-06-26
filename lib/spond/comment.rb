@@ -2,11 +2,10 @@ require_relative "resource"
 
 module Spond
   class Comment < Resource
-    attr_reader :id, :from_profile_id, :timestamp, :text, :children, :reactions, :data
+    attr_reader :from_profile_id, :timestamp, :text, :children, :reactions
 
     def initialize(data)
-      @data = data
-      @id = data["id"]
+      super(data)
       @from_profile_id = data["fromProfileId"]
       @timestamp = data["timestamp"]
       @text = data["text"]
@@ -37,18 +36,6 @@ module Spond
 
     def child_comments
       @child_comments ||= @children.map { |child_data| self.class.new(child_data) }
-    end
-
-    def method_missing(method_name, *args, &block)
-      if @data.key?(method_name.to_s)
-        @data[method_name.to_s]
-      else
-        super
-      end
-    end
-
-    def respond_to_missing?(method_name, include_private = false)
-      @data.key?(method_name.to_s) || super
     end
   end
 end

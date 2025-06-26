@@ -35,15 +35,14 @@ RSpec.describe Spond::Group do
     let(:group_data) { {"id" => "123", "name" => "Test Group", "description" => "A test group"} }
     let(:group) { described_class.new(group_data) }
 
-    describe "#initialize" do
-      it "sets the id and data attributes" do
+    describe "Resource base functionality" do
+      it "inherits common Resource functionality" do
+        expect(group).to be_a(Spond::Resource)
         expect(group.id).to eq("123")
         expect(group.data).to eq(group_data)
       end
-    end
 
-    describe "#method_missing" do
-      it "returns data values for keys that exist" do
+      it "provides data access via method_missing" do
         expect(group.name).to eq("Test Group")
         expect(group.description).to eq("A test group")
       end
@@ -51,21 +50,16 @@ RSpec.describe Spond::Group do
       it "raises NoMethodError for keys that don't exist" do
         expect { group.nonexistent_field }.to raise_error(NoMethodError)
       end
-    end
 
-    describe "#respond_to_missing?" do
-      it "returns true for keys that exist in data" do
+      it "responds correctly to attribute queries" do
         expect(group.respond_to?(:name)).to be true
         expect(group.respond_to?(:description)).to be true
-      end
-
-      it "returns false for keys that don't exist in data" do
         expect(group.respond_to?(:nonexistent_field)).to be false
       end
     end
 
-    describe "#events" do
-      it "calls Event.for_group with the group id" do
+    describe "#events (has_many association)" do
+      it "calls Event.for_group with the group id via has_many" do
         expect(Spond::Event).to receive(:for_group).with("123").and_return([])
         group.events
       end
