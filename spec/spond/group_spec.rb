@@ -10,10 +10,11 @@ RSpec.describe Spond::Group do
 
   describe ".all" do
     context "when the request is successful", :vcr do
-      it "fetches the groups data" do
+      it "fetches the groups data and returns Group instances" do
         VCR.use_cassette("group/all_success") do
-          groups_data = described_class.all
-          expect(groups_data).to be_a(Array)
+          groups = described_class.all
+          expect(groups).to be_a(Array)
+          expect(groups.first).to be_a(Spond::Group) if groups.any?
         end
       end
     end
@@ -26,6 +27,53 @@ RSpec.describe Spond::Group do
             described_class.all
           }.to raise_error(/API request failed/)
         end
+      end
+    end
+  end
+
+  describe "instance methods" do
+    let(:group_data) { {"id" => "123", "name" => "Test Group", "description" => "A test group"} }
+    let(:group) { described_class.new(group_data) }
+
+    describe "#initialize" do
+      it "sets the id and data attributes" do
+        expect(group.id).to eq("123")
+        expect(group.data).to eq(group_data)
+      end
+    end
+
+    describe "#method_missing" do
+      it "returns data values for keys that exist" do
+        expect(group.name).to eq("Test Group")
+        expect(group.description).to eq("A test group")
+      end
+
+      it "raises NoMethodError for keys that don't exist" do
+        expect { group.nonexistent_field }.to raise_error(NoMethodError)
+      end
+    end
+
+    describe "#respond_to_missing?" do
+      it "returns true for keys that exist in data" do
+        expect(group.respond_to?(:name)).to be true
+        expect(group.respond_to?(:description)).to be true
+      end
+
+      it "returns false for keys that don't exist in data" do
+        expect(group.respond_to?(:nonexistent_field)).to be false
+      end
+    end
+
+    describe "#events" do
+      it "calls Event.for_group with the group id" do
+        expect(Spond::Event).to receive(:for_group).with("123").and_return([])
+        group.events
+      end
+
+      it "memoizes the result" do
+        expect(Spond::Event).to receive(:for_group).with("123").and_return([]).once
+        group.events
+        group.events
       end
     end
   end

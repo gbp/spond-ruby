@@ -86,6 +86,13 @@ RSpec.describe Spond do
     end
   end
 
+  describe ".events" do
+    it "calls Event.where" do
+      expect(Spond::Event).to receive(:where)
+      Spond.events
+    end
+  end
+
   it "has a version number" do
     expect(Spond::VERSION).not_to be_nil
   end

@@ -16,6 +16,16 @@ RSpec.describe Spond::Event do
           expect(events_data).to be_a(Array)
         end
       end
+
+      it "accepts optional parameters" do
+        expect(client).to receive(:get).with("/sponds", params: {groupId: "123"})
+        described_class.where(groupId: "123")
+      end
+
+      it "calls client.get with no params when no arguments given" do
+        expect(client).to receive(:get).with("/sponds", params: {})
+        described_class.where
+      end
     end
 
     context "when the request fails", :vcr do
@@ -27,6 +37,13 @@ RSpec.describe Spond::Event do
           }.to raise_error(/API request failed/)
         end
       end
+    end
+  end
+
+  describe ".for_group" do
+    it "calls .where with groupId parameter" do
+      expect(described_class).to receive(:where).with(groupId: "group-123")
+      described_class.for_group("group-123")
     end
   end
 end
