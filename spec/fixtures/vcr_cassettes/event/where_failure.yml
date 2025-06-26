@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.spond.com/core/v1/sponds
+    uri: https://api.spond.com/core/v1/sponds?includeComments=true
     headers:
       Authorization:
       - Bearer test-token-12345

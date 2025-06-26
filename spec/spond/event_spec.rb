@@ -10,21 +10,34 @@ RSpec.describe Spond::Event do
 
   describe ".where" do
     context "when the request is successful", :vcr do
-      it "fetches the events data" do
+      it "fetches the events data and returns Event instances" do
         VCR.use_cassette("event/where_success") do
-          events_data = described_class.where
-          expect(events_data).to be_a(Array)
+          events = described_class.where
+          expect(events).to be_a(Array)
+          expect(events.first).to be_a(Spond::Event) if events.any?
         end
       end
 
-      it "accepts optional parameters" do
-        expect(client).to receive(:get).with("/sponds", params: {groupId: "123"})
+      it "includes comments by default" do
+        expect(client).to receive(:get).with("/sponds", params: {
+          includeComments: true
+        }).and_return([])
+        described_class.where
+      end
+
+      it "accepts optional parameters and merges with defaults" do
+        expect(client).to receive(:get).with("/sponds", params: {
+          includeComments: true,
+          groupId: "123"
+        }).and_return([])
         described_class.where(groupId: "123")
       end
 
-      it "calls client.get with no params when no arguments given" do
-        expect(client).to receive(:get).with("/sponds", params: {})
-        described_class.where
+      it "allows overriding defaults" do
+        expect(client).to receive(:get).with("/sponds", params: {
+          includeComments: false
+        }).and_return([])
+        described_class.where(includeComments: false)
       end
     end
 
@@ -44,6 +57,90 @@ RSpec.describe Spond::Event do
     it "calls .where with groupId parameter" do
       expect(described_class).to receive(:where).with(groupId: "group-123")
       described_class.for_group("group-123")
+    end
+
+    it "allows overriding parameters" do
+      expect(described_class).to receive(:where).with(
+        groupId: "group-123",
+        includeComments: false
+      )
+      described_class.for_group("group-123", includeComments: false)
+    end
+  end
+
+  describe "instance methods" do
+    let(:event_data) do
+      {
+        "id" => "event123",
+        "title" => "Test Event",
+        "comments" => [
+          {
+            "id" => "comment1",
+            "text" => "Great event!",
+            "fromProfileId" => "profile1",
+            "timestamp" => "2023-12-01T10:30:00Z",
+            "children" => [],
+            "reactions" => {}
+          }
+        ]
+      }
+    end
+    let(:event) { described_class.new(event_data) }
+
+    describe "#initialize" do
+      it "sets the id and data attributes" do
+        expect(event.id).to eq("event123")
+        expect(event.data).to eq(event_data)
+      end
+
+      it "parses comments into Comment objects" do
+        expect(event.comments).to be_an(Array)
+        expect(event.comments.length).to eq(1)
+        expect(event.comments.first).to be_a(Spond::Comment)
+        expect(event.comments.first.id).to eq("comment1")
+      end
+
+      it "handles events without comments" do
+        event_without_comments = described_class.new({"id" => "event456"})
+        expect(event_without_comments.comments).to eq([])
+      end
+    end
+
+    describe "#has_comments?" do
+      it "returns true when comments exist" do
+        expect(event.has_comments?).to be true
+      end
+
+      it "returns false when no comments exist" do
+        event_without_comments = described_class.new({"id" => "event456"})
+        expect(event_without_comments.has_comments?).to be false
+      end
+    end
+
+    describe "#comment_count" do
+      it "returns the number of comments" do
+        expect(event.comment_count).to eq(1)
+      end
+    end
+
+    describe "#method_missing" do
+      it "returns data values for keys that exist" do
+        expect(event.title).to eq("Test Event")
+      end
+
+      it "raises NoMethodError for keys that don't exist" do
+        expect { event.nonexistent_field }.to raise_error(NoMethodError)
+      end
+    end
+
+    describe "#respond_to_missing?" do
+      it "returns true for keys that exist in data" do
+        expect(event.respond_to?(:title)).to be true
+      end
+
+      it "returns false for keys that don't exist in data" do
+        expect(event.respond_to?(:nonexistent_field)).to be false
+      end
     end
   end
 end

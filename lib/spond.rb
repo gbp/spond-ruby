@@ -2,6 +2,7 @@ require_relative "spond/client"
 require_relative "spond/event"
 require_relative "spond/profile"
 require_relative "spond/group"
+require_relative "spond/comment"
 require_relative "spond/version"
 
 module Spond
