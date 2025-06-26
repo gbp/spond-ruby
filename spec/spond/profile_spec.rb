@@ -12,13 +12,12 @@ RSpec.describe Spond::Profile do
     context "when the request is successful", :vcr do
       it "fetches and caches the profile data" do
         VCR.use_cassette("profile/get_success") do
-          profile_data = described_class.get
-          expect(profile_data).to include(
-            "id" => "user123",
-            "firstName" => "John",
-            "lastName" => "Doe",
-            "primaryEmail" => "john@example.com"
-          )
+          profile = described_class.get
+          expect(profile).to be_a(Spond::Profile)
+          expect(profile.id).to eq("user123")
+          expect(profile.first_name).to eq("John")
+          expect(profile.last_name).to eq("Doe")
+          expect(profile.primary_email).to eq("john@example.com")
         end
       end
     end
