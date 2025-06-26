@@ -1,6 +1,7 @@
 require "json"
 require "net/http"
 require "uri"
+require_relative "version"
 
 module Spond
   class Client
@@ -59,6 +60,7 @@ module Spond
       request = request_class.new(uri)
       request["Content-Type"] = "application/json"
       request["Authorization"] = "Bearer #{@token}" if @token
+      request["User-Agent"] = "spond-ruby/#{Spond::VERSION}"
       request.body = data.to_json if data
 
       response = http.request(request)
