@@ -35,13 +35,13 @@ RSpec.describe Spond::Comment do
       expect(comment.reactions).to be_a(Hash)
     end
 
-    it "maps attribute keys correctly" do
+    it "maps attribute keys correctly with defaults" do
       attributes = described_class.attributes
-      expect(attributes).to include([:from_profile_id, "fromProfileId"])
-      expect(attributes).to include([:timestamp, "timestamp"])
-      expect(attributes).to include([:text, "text"])
-      expect(attributes).to include([:children, "children"])
-      expect(attributes).to include([:reactions, "reactions"])
+      expect(attributes).to include([:from_profile_id, "fromProfileId", nil])
+      expect(attributes).to include([:timestamp, "timestamp", nil])
+      expect(attributes).to include([:text, "text", nil])
+      expect(attributes).to include([:children, "children", []])
+      expect(attributes).to include([:reactions, "reactions", {}])
     end
 
     it "inherits Resource base functionality" do
@@ -50,10 +50,21 @@ RSpec.describe Spond::Comment do
       expect(comment.data).to eq(comment_data)
     end
 
-    it "sets default values in initialize" do
+    it "uses default values when data is missing" do
       comment_without_children = described_class.new({"id" => "test", "text" => "test"})
-      expect(comment_without_children.children).to eq([])
-      expect(comment_without_children.reactions).to eq({})
+      expect(comment_without_children.children).to eq([])  # Default from attribute
+      expect(comment_without_children.reactions).to eq({}) # Default from attribute
+    end
+
+    it "uses data values when present, ignoring defaults" do
+      comment_with_data = described_class.new({
+        "id" => "test",
+        "text" => "test",
+        "children" => [{"id" => "child1"}],
+        "reactions" => {"👍" => {"user1" => 0}}
+      })
+      expect(comment_with_data.children).to eq([{"id" => "child1"}])
+      expect(comment_with_data.reactions).to eq({"👍" => {"user1" => 0}})
     end
 
     it "allows access to non-attribute data via method_missing" do

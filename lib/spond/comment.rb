@@ -5,14 +5,8 @@ module Spond
     attribute :from_profile_id, key: "fromProfileId"
     attribute :timestamp
     attribute :text
-    attribute :children
-    attribute :reactions
-
-    def initialize(data)
-      super
-      @children ||= []
-      @reactions ||= {}
-    end
+    attribute :children, default: []
+    attribute :reactions, default: {}
 
     def timestamp_parsed
       @timestamp_parsed ||= Time.parse(@timestamp) if @timestamp

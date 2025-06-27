@@ -9,9 +9,9 @@ module Spond
       @attributes ||= []
     end
 
-    def self.attribute(name, key: nil)
+    def self.attribute(name, key: nil, default: nil)
       key ||= name.to_s
-      attributes << [name, key]
+      attributes << [name, key, default]
       attr_reader name
     end
 
@@ -53,8 +53,10 @@ module Spond
       @id = data["id"]
 
       # Set attribute values from data
-      self.class.attributes.each do |name, key|
-        instance_variable_set("@#{name}", @data[key])
+      self.class.attributes.each do |name, key, default|
+        value = @data[key]
+        value = default if value.nil? && !default.nil?
+        instance_variable_set("@#{name}", value)
       end
     end
 

@@ -12,6 +12,9 @@ RSpec.describe Spond::Resource do
       attribute :full_name, key: "fullName"
       attribute :age, key: "userAge"
       attribute :email
+      attribute :status, default: "active"
+      attribute :tags, default: []
+      attribute :settings, default: {}
     end
   end
 
@@ -34,24 +37,30 @@ RSpec.describe Spond::Resource do
       expect(test_instance).to respond_to(:full_name)
       expect(test_instance).to respond_to(:age)
       expect(test_instance).to respond_to(:email)
+      expect(test_instance).to respond_to(:status)
+      expect(test_instance).to respond_to(:tags)
+      expect(test_instance).to respond_to(:settings)
     end
 
     it "stores attribute definitions" do
       attributes = test_class.attributes
-      expect(attributes).to include([:name, "name"])
-      expect(attributes).to include([:full_name, "fullName"])
-      expect(attributes).to include([:age, "userAge"])
-      expect(attributes).to include([:email, "email"])
+      expect(attributes).to include([:name, "name", nil])
+      expect(attributes).to include([:full_name, "fullName", nil])
+      expect(attributes).to include([:age, "userAge", nil])
+      expect(attributes).to include([:email, "email", nil])
+      expect(attributes).to include([:status, "status", "active"])
+      expect(attributes).to include([:tags, "tags", []])
+      expect(attributes).to include([:settings, "settings", {}])
     end
 
     it "uses the attribute name as key when no key specified" do
-      attribute_def = test_class.attributes.find { |name, key| name == :name }
-      expect(attribute_def).to eq([:name, "name"])
+      attribute_def = test_class.attributes.find { |name, key, default| name == :name }
+      expect(attribute_def).to eq([:name, "name", nil])
     end
 
     it "uses custom key when specified" do
-      attribute_def = test_class.attributes.find { |name, key| name == :full_name }
-      expect(attribute_def).to eq([:full_name, "fullName"])
+      attribute_def = test_class.attributes.find { |name, key, default| name == :full_name }
+      expect(attribute_def).to eq([:full_name, "fullName", nil])
     end
   end
 
@@ -61,6 +70,9 @@ RSpec.describe Spond::Resource do
       expect(test_instance.full_name).to eq("John Doe")
       expect(test_instance.age).to eq(30)
       expect(test_instance.email).to eq("john@example.com")
+      expect(test_instance.status).to eq("active")
+      expect(test_instance.tags).to eq([])
+      expect(test_instance.settings).to eq({})
     end
 
     it "sets id and data from parent Resource class" do
@@ -76,6 +88,9 @@ RSpec.describe Spond::Resource do
       expect(incomplete_instance.full_name).to be_nil
       expect(incomplete_instance.age).to be_nil
       expect(incomplete_instance.email).to be_nil
+      expect(incomplete_instance.status).to eq("active")  # Default value
+      expect(incomplete_instance.tags).to eq([])          # Default value
+      expect(incomplete_instance.settings).to eq({})      # Default value
     end
   end
 
@@ -85,7 +100,7 @@ RSpec.describe Spond::Resource do
         attribute :phone
       end
 
-      expect(test_class.attributes.map(&:first)).to contain_exactly(:name, :full_name, :age, :email)
+      expect(test_class.attributes.map(&:first)).to contain_exactly(:name, :full_name, :age, :email, :status, :tags, :settings)
       expect(subclass.attributes.map(&:first)).to contain_exactly(:phone)
     end
 
@@ -100,7 +115,7 @@ RSpec.describe Spond::Resource do
 
       expect(sibling1.attributes.map(&:first)).to eq([:field1])
       expect(sibling2.attributes.map(&:first)).to eq([:field2])
-      expect(test_class.attributes.map(&:first)).to contain_exactly(:name, :full_name, :age, :email)
+      expect(test_class.attributes.map(&:first)).to contain_exactly(:name, :full_name, :age, :email, :status, :tags, :settings)
     end
   end
 
@@ -173,7 +188,84 @@ RSpec.describe Spond::Resource do
       expect(comment.timestamp).to eq("2023-12-01T10:30:00Z")
       expect(comment.text).to eq("Great comment!")
       expect(comment.children).to eq([])  # Default from initialize
-      expect(comment.reactions).to eq({}) # Default from initialize
+      expect(comment.reactions).to eq({}) # Default from attribute
+    end
+  end
+
+  describe "attribute defaults" do
+    let(:default_test_class) do
+      Class.new(Spond::Resource) do
+        def self.name
+          "DefaultTest"
+        end
+
+        attribute :name
+        attribute :count, default: 0
+        attribute :active, default: true
+        attribute :tags, default: []
+        attribute :metadata, default: {}
+        attribute :description, default: "No description"
+      end
+    end
+
+    it "uses default values when data is missing" do
+      data = {"id" => "123", "name" => "Test"}
+      instance = default_test_class.new(data)
+
+      expect(instance.name).to eq("Test")
+      expect(instance.count).to eq(0)
+      expect(instance.active).to be true
+      expect(instance.tags).to eq([])
+      expect(instance.metadata).to eq({})
+      expect(instance.description).to eq("No description")
+    end
+
+    it "uses data values when present, ignoring defaults" do
+      data = {
+        "id" => "123",
+        "name" => "Test",
+        "count" => 5,
+        "active" => false,
+        "tags" => ["important"],
+        "metadata" => {"type" => "test"},
+        "description" => "Custom description"
+      }
+      instance = default_test_class.new(data)
+
+      expect(instance.name).to eq("Test")
+      expect(instance.count).to eq(5)
+      expect(instance.active).to be false
+      expect(instance.tags).to eq(["important"])
+      expect(instance.metadata).to eq({"type" => "test"})
+      expect(instance.description).to eq("Custom description")
+    end
+
+    it "uses default for nil values in data" do
+      data = {
+        "id" => "123",
+        "name" => "Test",
+        "count" => nil,
+        "active" => nil,
+        "tags" => nil
+      }
+      instance = default_test_class.new(data)
+
+      expect(instance.name).to eq("Test")
+      expect(instance.count).to eq(0)        # Default used
+      expect(instance.active).to be true     # Default used
+      expect(instance.tags).to eq([])        # Default used
+    end
+
+    it "preserves false and 0 values from data" do
+      data = {
+        "id" => "123",
+        "count" => 0,
+        "active" => false
+      }
+      instance = default_test_class.new(data)
+
+      expect(instance.count).to eq(0)        # Data value, not default
+      expect(instance.active).to be false    # Data value, not default
     end
   end
 end

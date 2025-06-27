@@ -55,9 +55,9 @@ RSpec.describe Spond::Profile do
 
     it "maps attribute keys correctly" do
       attributes = described_class.attributes
-      expect(attributes).to include([:first_name, "firstName"])
-      expect(attributes).to include([:last_name, "lastName"])
-      expect(attributes).to include([:primary_email, "primaryEmail"])
+      expect(attributes).to include([:first_name, "firstName", nil])
+      expect(attributes).to include([:last_name, "lastName", nil])
+      expect(attributes).to include([:primary_email, "primaryEmail", nil])
     end
 
     it "inherits Resource base functionality" do
