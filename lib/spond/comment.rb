@@ -2,15 +2,16 @@ require_relative "resource"
 
 module Spond
   class Comment < Resource
-    attr_reader :from_profile_id, :timestamp, :text, :children, :reactions
+    attribute :from_profile_id, key: "fromProfileId"
+    attribute :timestamp
+    attribute :text
+    attribute :children
+    attribute :reactions
 
     def initialize(data)
-      super(data)
-      @from_profile_id = data["fromProfileId"]
-      @timestamp = data["timestamp"]
-      @text = data["text"]
-      @children = data["children"] || []
-      @reactions = data["reactions"] || {}
+      super
+      @children ||= []
+      @reactions ||= {}
     end
 
     def timestamp_parsed

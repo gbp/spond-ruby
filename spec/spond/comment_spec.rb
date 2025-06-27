@@ -26,14 +26,8 @@ RSpec.describe Spond::Comment do
 
   let(:comment) { described_class.new(comment_data) }
 
-  describe "Resource base functionality" do
-    it "inherits common Resource functionality" do
-      expect(comment).to be_a(Spond::Resource)
-      expect(comment.id).to eq("comment123")
-      expect(comment.data).to eq(comment_data)
-    end
-
-    it "sets all attributes correctly" do
+  describe "attribute functionality" do
+    it "defines attribute readers using attribute method" do
       expect(comment.from_profile_id).to eq("profile123")
       expect(comment.timestamp).to eq("2023-12-01T10:30:00Z")
       expect(comment.text).to eq("This is my witty comment")
@@ -41,15 +35,28 @@ RSpec.describe Spond::Comment do
       expect(comment.reactions).to be_a(Hash)
     end
 
-    it "handles missing optional fields" do
-      minimal_data = {"id" => "comment123", "text" => "Hello"}
-      minimal_comment = described_class.new(minimal_data)
-
-      expect(minimal_comment.children).to eq([])
-      expect(minimal_comment.reactions).to eq({})
+    it "maps attribute keys correctly" do
+      attributes = described_class.attributes
+      expect(attributes).to include([:from_profile_id, "fromProfileId"])
+      expect(attributes).to include([:timestamp, "timestamp"])
+      expect(attributes).to include([:text, "text"])
+      expect(attributes).to include([:children, "children"])
+      expect(attributes).to include([:reactions, "reactions"])
     end
 
-    it "provides data access via method_missing" do
+    it "inherits Resource base functionality" do
+      expect(comment).to be_a(Spond::Resource)
+      expect(comment.id).to eq("comment123")
+      expect(comment.data).to eq(comment_data)
+    end
+
+    it "sets default values in initialize" do
+      comment_without_children = described_class.new({"id" => "test", "text" => "test"})
+      expect(comment_without_children.children).to eq([])
+      expect(comment_without_children.reactions).to eq({})
+    end
+
+    it "allows access to non-attribute data via method_missing" do
       expect(comment.fromProfileId).to eq("profile123")
     end
 
@@ -57,8 +64,9 @@ RSpec.describe Spond::Comment do
       expect { comment.nonexistent_field }.to raise_error(NoMethodError)
     end
 
-    it "responds correctly to attribute queries" do
-      expect(comment.respond_to?(:fromProfileId)).to be true
+    it "responds correctly to attribute and method_missing queries" do
+      expect(comment.respond_to?(:text)).to be true  # attribute
+      expect(comment.respond_to?(:fromProfileId)).to be true  # method_missing
       expect(comment.respond_to?(:nonexistent_field)).to be false
     end
   end

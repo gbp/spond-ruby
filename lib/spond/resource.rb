@@ -2,6 +2,24 @@ module Spond
   class Resource
     attr_reader :id, :data
 
+    # Class variable to store defined attributes
+    @attributes = []
+
+    def self.attributes
+      @attributes ||= []
+    end
+
+    def self.attribute(name, key: nil)
+      key ||= name.to_s
+      attributes << [name, key]
+      attr_reader name
+    end
+
+    def self.inherited(subclass)
+      super
+      subclass.instance_variable_set(:@attributes, [])
+    end
+
     def self.client
       Spond.client
     end
@@ -33,6 +51,11 @@ module Spond
     def initialize(data)
       @data = data
       @id = data["id"]
+
+      # Set attribute values from data
+      self.class.attributes.each do |name, key|
+        instance_variable_set("@#{name}", @data[key])
+      end
     end
 
     def method_missing(method_name, *args, &block)

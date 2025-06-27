@@ -33,4 +33,41 @@ RSpec.describe Spond::Profile do
       end
     end
   end
+
+  describe "attributes" do
+    let(:profile_data) do
+      {
+        "id" => "profile123",
+        "firstName" => "John",
+        "lastName" => "Doe",
+        "primaryEmail" => "john@example.com",
+        "email" => "john@secondary.com"
+      }
+    end
+
+    let(:profile) { described_class.new(profile_data) }
+
+    it "defines attribute readers using attribute method" do
+      expect(profile.first_name).to eq("John")
+      expect(profile.last_name).to eq("Doe")
+      expect(profile.primary_email).to eq("john@example.com")
+    end
+
+    it "maps attribute keys correctly" do
+      attributes = described_class.attributes
+      expect(attributes).to include([:first_name, "firstName"])
+      expect(attributes).to include([:last_name, "lastName"])
+      expect(attributes).to include([:primary_email, "primaryEmail"])
+    end
+
+    it "inherits Resource base functionality" do
+      expect(profile).to be_a(Spond::Resource)
+      expect(profile.id).to eq("profile123")
+      expect(profile.data).to eq(profile_data)
+    end
+
+    it "allows access to non-attribute data via method_missing" do
+      expect(profile.email).to eq("john@secondary.com")
+    end
+  end
 end
