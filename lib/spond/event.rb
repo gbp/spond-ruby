@@ -14,6 +14,22 @@ module Spond
       response.map { |event_data| new(event_data) }
     end
 
+    def self.before(time, params = {})
+      where(**params.merge(maxEndTimestamp: time))
+    end
+
+    def self.past(params = {})
+      before(Time.now, params)
+    end
+
+    def self.after(time, params = {})
+      where(**params.merge(minStartTimestamp: time))
+    end
+
+    def self.future(params = {})
+      after(Time.now, params)
+    end
+
     def self.for_group(group_id, params = {})
       where(**params.merge(groupId: group_id))
     end
