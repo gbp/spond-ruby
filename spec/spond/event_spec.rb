@@ -20,7 +20,9 @@ RSpec.describe Spond::Event do
 
       it "includes comments by default" do
         expect(client).to receive(:get).with("/sponds", params: {
-          includeComments: true
+          includeComments: true,
+          addProfileInfo: true,
+          order: 'asc'
         }).and_return([])
         described_class.where
       end
@@ -28,6 +30,8 @@ RSpec.describe Spond::Event do
       it "accepts optional parameters and merges with defaults" do
         expect(client).to receive(:get).with("/sponds", params: {
           includeComments: true,
+          addProfileInfo: true,
+          order: 'asc',
           groupId: "123"
         }).and_return([])
         described_class.where(groupId: "123")
@@ -35,7 +39,9 @@ RSpec.describe Spond::Event do
 
       it "allows overriding defaults" do
         expect(client).to receive(:get).with("/sponds", params: {
-          includeComments: false
+          includeComments: false,
+          addProfileInfo: true,
+          order: 'asc'
         }).and_return([])
         described_class.where(includeComments: false)
       end

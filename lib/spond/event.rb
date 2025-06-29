@@ -6,7 +6,9 @@ module Spond
 
     def self.where(params = {})
       params = {
-        includeComments: true
+        includeComments: true,
+        addProfileInfo: true,
+        order: 'asc'
       }.merge(params)
       response = client.get("/sponds", params: params)
       response.map { |event_data| new(event_data) }
